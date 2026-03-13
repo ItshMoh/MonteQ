@@ -1,0 +1,2445 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Synth API offers programmatic access to probabilistic price forecasts for Equities, Commodities and Cryptocurrencies.",
+        "title": "Synth",
+        "contact": {
+            "url": "https://synthdata.co"
+        },
+        "version": "1.0",
+        "x-logo": {
+            "url": "/docs/assets/images/logo.svg"
+        }
+    },
+    "paths": {
+        "/insights/liquidation": {
+            "get": {
+                "description": "Get long and short liquidation probability estimates for an asset at various price levels. Returns the probability of liquidation within 6, 12, 18, and 24 hour windows for both long and short positions. Useful for assessing leverage risk, setting stop-loss levels, and managing margin exposure. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Liquidation probability",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.LiquidationProbabilityResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/lp-bounds": {
+            "get": {
+                "description": "Get price interval analysis for an asset over the next 24 hours. Returns price intervals with the probability of price staying within each interval, expected time in-range, and estimated impermanent loss. Useful for concentrated liquidity positioning, options strike selection, and range-bound trading strategies. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Liquidity provider bounds",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.LPBoundsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/lp-probabilities": {
+            "get": {
+                "description": "Get the probability of an asset's price being above or below specific price targets over the next 24 hours. Returns probabilities for 11 upside and 11 downside price levels relative to the current price. Useful for options strike selection, Polymarket up/down contracts, and directional risk assessment. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Liquidity provider probabilities",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.LPProbabilitiesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/option-pricing": {
+            "get": {
+                "description": "Get SynthData-derived option prices for an asset. Returns theoretical call and put prices across a range of strike prices with expiry time, using SynthData's ensemble volatility forecasts. Compare against market-quoted premiums to identify mispriced options. Supported assets: BTC, ETH, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Option pricing",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.OptionPricingResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/polymarket/range": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for daily price range contracts. Returns both synth and Polymarket probabilities per range, current outcome, and order book data. Compare to identify mispriced range bets. Supported assets: BTC, ETH, SOL, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Polymarket price range",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.PriceRangeMarket"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/polymarket/up-down/15min": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for 15 minutes Up/Down contracts. Returns both synth and Polymarket probabilities, current outcome, and order book data (best bid/ask). Compare to identify mispriced bets on shorter timeframes. Supported assets: BTC, ETH, SOL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Polymarket up/down 15 minutes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 1h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PolymarketUpDownResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/polymarket/up-down/5min": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for 5 minutes Up/Down contracts. Returns both synth and Polymarket probabilities, current outcome, and order book data (best bid/ask). Compare to identify mispriced bets on shorter timeframes. Supported assets: BTC, ETH, SOL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Polymarket up/down 5 minutes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 1h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PolymarketUpDownResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/polymarket/up-down/daily": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for daily Up/Down contracts. Returns both synth and Polymarket probabilities, current outcome, and order book data (best bid/ask). Compare to identify mispriced bets. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Polymarket up/down daily",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PolymarketUpDownResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/polymarket/up-down/hourly": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for hourly Up/Down contracts. Returns both synth and Polymarket probabilities, current outcome, and order book data (best bid/ask). Compare to identify mispriced bets on shorter timeframes. Supported assets: BTC, ETH, SOL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Polymarket up/down hourly",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 1h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PolymarketUpDownResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/prediction-percentiles": {
+            "get": {
+                "description": "Get price distribution percentiles for an asset over the 24-hour forecast horizon. Returns predicted prices at 9 percentile levels (0.5th, 5th, 20th, 35th, 50th, 65th, 80th, 95th, 99.5th), giving the full probability distribution of expected price movements. Useful for position sizing, setting price targets, and understanding tail risk. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Prediction Percentiles - meta model from top 10 miners",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PredictionPercentiles"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/insights/volatility": {
+            "get": {
+                "description": "Get SynthData's volatility forecasts for an asset. Returns expected volatility over the next 24 hours, along with historical realized volatility.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Insight - Volatility",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14 if horizon=24h, 6 if horizon=1h). See 'Leaderboard - Latest Meta-Leaderboard'.",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.VolatilityResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/leaderboard/historical": {
+            "get": {
+                "description": "Gets the leaderboard history.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Leaderboard -  Leaderboard History V2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "2025-02-03T10:19:04Z",
+                        "description": "an URL encoded ISO 8601 date/time to start from (2025-02-03T10:19:04Z or 2025-02-03T17:19:04+07:00 or 2025-02-03)",
+                        "name": "start_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "2025-02-03T10:19:04Z",
+                        "description": "an URL encoded ISO 8601 date/time to end at (2025-02-03T10:19:04Z or 2025-02-03T17:19:04+07:00 or 2025-02-03)",
+                        "name": "end_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "low",
+                        "description": "Prompt name, high for 1h prompt or low for 24h prompt",
+                        "name": "prompt_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.LeaderboardItemV2"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/leaderboard/latest": {
+            "get": {
+                "description": "Gets the current leaderboard.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Leaderboard - Latest Leaderboard V2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "low",
+                        "description": "Prompt name, high for 1h prompt or low for 24h prompt",
+                        "name": "prompt_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.LeaderboardItemV2"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/meta-leaderboard/historical": {
+            "get": {
+                "description": "Gets the meta-leaderboard history, which aggregates miners' incentives over a period of days in the past.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Leaderboard - Meta-Leaderboard History V2",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "2025-02-03T10:19:04Z",
+                        "description": "an URL encoded ISO 8601 date/time to start from (2025-02-03T10:19:04Z or 2025-02-03T17:19:04+07:00 or 2025-02-03)",
+                        "name": "start_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "low",
+                        "description": "Prompt name, high for 1h prompt or low for 24h prompt",
+                        "name": "prompt_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14)",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.LeaderboardItemV2"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/meta-leaderboard/latest": {
+            "get": {
+                "description": "Get the current meta-leaderboard, which aggregates miners' incentives over a period of days. This provides another way to rank prediction accuracy, thereby increasing stability.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Leaderboard - Latest Meta-Leaderboard V2",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "example": 14,
+                        "description": "Number of days to aggregate for the meta-leaderboard (default is 14)",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "low",
+                        "description": "Prompt name, high for 1h prompt or low for 24h prompt",
+                        "name": "prompt_name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.LeaderboardItemV2"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/prediction/best": {
+            "get": {
+                "description": "Gets the latest prediction rates of the current best miner.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Predictions - Best Prediction Rates",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "the symbol of the asset: BTC, ETH, XAU, SOL, SPYX, NVDAX, TSLAX, AAPLX, GOOGLX",
+                        "name": "asset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 300,
+                        "description": "the time interval (in seconds) of the validator prompt between each rate. 300 or 60.",
+                        "name": "time_increment",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 86400,
+                        "description": "the length of time (in seconds) of the validator prompt from the start time. 86400 or 3600.",
+                        "name": "time_length",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.PredictionResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "No prediction available",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/prediction/historical": {
+            "get": {
+                "description": "Gets the historical prediction rates.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Predictions - Historical Prediction Rates",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "a list of specific miners by their ID",
+                        "name": "miner",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "the symbol of the asset: BTC, ETH, XAU, SOL, SPYX, NVDAX, TSLAX, AAPLX, GOOGLX",
+                        "name": "asset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "2025-02-03T10:19:04Z",
+                        "description": "an ISO 8601 date/time to start the historical rates from (2025-02-03T10:19:04Z or 2025-02-03T17:19:04+07:00 or 2025-02-03)",
+                        "name": "start_time",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 300,
+                        "description": "the time interval (in seconds) of the validator prompt between each rate. 300 or 60.",
+                        "name": "time_increment",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 86400,
+                        "description": "the length of time (in seconds) of the validator prompt from the start time. 86400 or 3600.",
+                        "name": "time_length",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.PredictionResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "No prediction available",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/prediction/latest": {
+            "get": {
+                "description": "Gets the latest valid prediction rates.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Predictions - Latest Prediction Rates",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "a list of specific miners by their ID",
+                        "name": "miner",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "the symbol of the asset: BTC, ETH, XAU, SOL, SPYX, NVDAX, TSLAX, AAPLX, GOOGLX",
+                        "name": "asset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 300,
+                        "description": "the time interval (in seconds) of the validator prompt between each rate. 300 or 60.",
+                        "name": "time_increment",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 86400,
+                        "description": "the length of time (in seconds) of the validator prompt from the start time. 86400 or 3600.",
+                        "name": "time_length",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Number of miners from the meta-leaderboard to use for the analysis (default is 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "Apikey MY_API_KEY",
+                        "description": "API key",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.PredictionResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "No prediction available",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/validation/miner": {
+            "get": {
+                "description": "Gets the validation status for a specific miner",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Validations - Miner Validation",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the miner to get validation for",
+                        "name": "uid",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.MinerValidationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/validation/scores/historical": {
+            "get": {
+                "description": "Gets the validation scores for all miners between two dates",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Validations - Historical Scores",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "2025-02-03T10:19:04Z",
+                        "description": "Start date (2025-02-03T10:19:04Z or 2025-02-03T17:19:04+07:00 or 2025-02-03)",
+                        "name": "from",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "2025-02-03T10:19:04Z",
+                        "description": "End date (2025-02-03T10:19:04Z or 2025-02-03T17:19:04+07:00 or 2025-02-03)",
+                        "name": "to",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Optional miner ID to filter by",
+                        "name": "miner_uid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "The symbol of the asset: BTC, ETH, XAU, SOL, SPYX, NVDAX, TSLAX, AAPLX, GOOGLX (default BTC)",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 300,
+                        "description": "the time interval (in seconds) of the validator prompt between each rate: 300 or 60 (default 300).",
+                        "name": "time_increment",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 86400,
+                        "description": "the length of time (in seconds) of the validator prompt from the start time: 86400 or 3600 (default 86400)",
+                        "name": "time_length",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.ValidationScore"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/validation/scores/latest": {
+            "get": {
+                "description": "Gets the most recent validation scores for all miners",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Validations - Latest Scores",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "The symbol of the asset: BTC, ETH, XAU, SOL, SPYX, NVDAX, TSLAX, AAPLX, GOOGLX (default BTC)",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 300,
+                        "description": "the time interval (in seconds) of the validator prompt between each rate: 300 or 60 (default 300).",
+                        "name": "time_increment",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 86400,
+                        "description": "the length of time (in seconds) of the validator prompt from the start time: 86400 or 3600 (default 86400)",
+                        "name": "time_length",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.ValidationScore"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/liquidation": {
+            "get": {
+                "description": "Get long and short liquidation probability estimates for an asset at various price levels. Returns the probability of liquidation within 6, 12, 18, and 24 hour windows for both long and short positions. Useful for assessing leverage risk, setting stop-loss levels, and managing margin exposure. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Liquidation probability",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.LiquidationProbabilityResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/lp-bounds": {
+            "get": {
+                "description": "Get price interval analysis for an asset over the next 24 hours. Returns price intervals with the probability of price staying within each interval, expected time in-range, and estimated impermanent loss. Useful for concentrated liquidity positioning, options strike selection, and range-bound trading strategies. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Liquidity provider bounds",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.LPBoundsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/lp-probabilities": {
+            "get": {
+                "description": "Get the probability of an asset's price being above or below specific price targets over the next 24 hours. Returns probabilities for 11 upside and 11 downside price levels relative to the current price. Useful for options strike selection, Polymarket up/down contracts, and directional risk assessment. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Liquidity provider probabilities",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.LPProbabilitiesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/option-pricing": {
+            "get": {
+                "description": "Get SynthData-derived option prices for an asset. Returns theoretical call and put prices across a range of strike prices with expiry time, using SynthData's ensemble volatility forecasts. Compare against market-quoted premiums to identify mispriced options. Supported assets: BTC, ETH, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Option pricing",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.OptionPricingResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/polymarket/range": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for daily price range contracts. Returns both synth and Polymarket probabilities per range, current outcome, and order book data. Compare to identify mispriced range bets. Supported assets: BTC, ETH, SOL, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Polymarket price range",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.PriceRangeMarket"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/polymarket/up-down/15min": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for 15 minutes Up/Down contracts. Returns both synth and Polymarket probabilities, current outcome, and order book data (best bid/ask). Compare to identify mispriced bets on shorter timeframes. Supported assets: BTC, ETH, SOL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Polymarket up/down 15 minutes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 1h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PolymarketUpDownResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/polymarket/up-down/5min": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for 5 minutes Up/Down contracts. Returns both synth and Polymarket probabilities, current outcome, and order book data (best bid/ask). Compare to identify mispriced bets on shorter timeframes. Supported assets: BTC, ETH, SOL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Polymarket up/down 5 minutes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 1h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PolymarketUpDownResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/polymarket/up-down/daily": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for daily Up/Down contracts. Returns both synth and Polymarket probabilities, current outcome, and order book data (best bid/ask). Compare to identify mispriced bets. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Polymarket up/down daily",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PolymarketUpDownResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/polymarket/up-down/hourly": {
+            "get": {
+                "description": "Get SynthData's estimated fair probabilities alongside live Polymarket odds for hourly Up/Down contracts. Returns both synth and Polymarket probabilities, current outcome, and order book data (best bid/ask). Compare to identify mispriced bets on shorter timeframes. Supported assets: BTC, ETH, SOL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Polymarket up/down hourly",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, SOL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "1h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 1h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PolymarketUpDownResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/prediction-percentiles": {
+            "get": {
+                "description": "Get price distribution percentiles for an asset over the 24-hour forecast horizon. Returns predicted prices at 9 percentile levels (0.5th, 5th, 20th, 35th, 50th, 65th, 80th, 95th, 99.5th), giving the full probability distribution of expected price movements. Useful for position sizing, setting price targets, and understanding tail risk. Supported assets: BTC, ETH, XAU, SOL, SPY, NVDA, GOOGL, TSLA, AAPL.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Prediction Percentiles - meta model from top 10 miners",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PredictionPercentiles"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/insights/volatility": {
+            "get": {
+                "description": "Get SynthData's volatility forecasts for an asset. Returns expected volatility over the next 24 hours, along with historical realized volatility.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Websocket Insight - Volatility",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "BTC",
+                        "description": "Symbol of the asset: BTC, ETH, XAU, SOL, JITOSOL, SPY, NVDA, GOOGL, TSLA, AAPL",
+                        "name": "asset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "24h",
+                        "description": "Forecast horizon: 1h for next-hour or 24h for next-day price intervals (default: 24h)",
+                        "name": "horizon",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YOUR_API_KEY",
+                        "description": "API key",
+                        "name": "apikey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.VolatilityResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "types.Forecast": {
+            "type": "object",
+            "properties": {
+                "average_volatility": {
+                    "type": "number"
+                },
+                "volatility": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "types.ForecastDataTyped": {
+            "type": "object",
+            "properties": {
+                "percentiles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.PercentileTyped"
+                    }
+                }
+            }
+        },
+        "types.HourlyProbability": {
+            "type": "object",
+            "properties": {
+                "12": {
+                    "type": "number"
+                },
+                "18": {
+                    "type": "number"
+                },
+                "24": {
+                    "type": "number"
+                },
+                "6": {
+                    "type": "number"
+                }
+            }
+        },
+        "types.Interval": {
+            "type": "object",
+            "properties": {
+                "full_width": {
+                    "type": "string"
+                },
+                "lower_bound": {
+                    "type": "number"
+                },
+                "upper_bound": {
+                    "type": "number"
+                }
+            }
+        },
+        "types.IntervalData": {
+            "type": "object",
+            "properties": {
+                "expected_impermanent_loss": {
+                    "type": "number"
+                },
+                "expected_time_in_interval": {
+                    "type": "number"
+                },
+                "interval": {
+                    "$ref": "#/definitions/types.Interval"
+                },
+                "probability_to_stay_in_interval": {
+                    "$ref": "#/definitions/types.StayInIntervalProbability"
+                }
+            }
+        },
+        "types.LPBoundsResponse": {
+            "type": "object",
+            "properties": {
+                "current_price": {
+                    "type": "number"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.IntervalData"
+                    }
+                },
+                "forecast_start_time": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.LPProbabilitiesResponse": {
+            "type": "object",
+            "properties": {
+                "current_price": {
+                    "type": "number"
+                },
+                "data": {
+                    "$ref": "#/definitions/types.PriceProbabilityData"
+                },
+                "forecast_start_time": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.LeaderboardItemV2": {
+            "type": "object",
+            "properties": {
+                "coldkey": {
+                    "type": "string"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "neuron_uid": {
+                    "type": "integer"
+                },
+                "rewards": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.LiquidationProbability": {
+            "type": "object",
+            "properties": {
+                "long_liquidation_probability": {
+                    "$ref": "#/definitions/types.HourlyProbability"
+                },
+                "price_change": {
+                    "type": "string"
+                },
+                "short_liquidation_probability": {
+                    "$ref": "#/definitions/types.HourlyProbability"
+                }
+            }
+        },
+        "types.LiquidationProbabilityResponse": {
+            "type": "object",
+            "properties": {
+                "current_price": {
+                    "type": "number"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.LiquidationProbability"
+                    }
+                },
+                "forecast_start_time": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.MinerValidationResponse": {
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "type": "string"
+                },
+                "response_time": {
+                    "type": "string"
+                },
+                "validated": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "types.OptionPricingResponse": {
+            "type": "object",
+            "properties": {
+                "call_options": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number"
+                    }
+                },
+                "current_price": {
+                    "type": "number"
+                },
+                "expiry_time": {
+                    "type": "string"
+                },
+                "forecast_start_time": {
+                    "type": "string"
+                },
+                "put_options": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "types.PercentileTyped": {
+            "type": "object",
+            "properties": {
+                "0.005": {
+                    "type": "number"
+                },
+                "0.05": {
+                    "type": "number"
+                },
+                "0.2": {
+                    "type": "number"
+                },
+                "0.35": {
+                    "type": "number"
+                },
+                "0.5": {
+                    "type": "number"
+                },
+                "0.65": {
+                    "type": "number"
+                },
+                "0.8": {
+                    "type": "number"
+                },
+                "0.95": {
+                    "type": "number"
+                },
+                "0.995": {
+                    "type": "number"
+                }
+            }
+        },
+        "types.PolymarketUpDownResponse": {
+            "type": "object",
+            "properties": {
+                "best_ask_price": {
+                    "type": "number"
+                },
+                "best_ask_size": {
+                    "type": "number"
+                },
+                "best_bid_price": {
+                    "type": "number"
+                },
+                "best_bid_size": {
+                    "type": "number"
+                },
+                "current_outcome": {
+                    "type": "string"
+                },
+                "current_price": {
+                    "type": "number"
+                },
+                "current_time": {
+                    "type": "string"
+                },
+                "event_creation_time": {
+                    "type": "string"
+                },
+                "event_end_time": {
+                    "type": "string"
+                },
+                "event_start_time": {
+                    "type": "string"
+                },
+                "forecast_start_time": {
+                    "type": "string"
+                },
+                "polymarket_last_trade_outcome": {
+                    "type": "string"
+                },
+                "polymarket_last_trade_price": {
+                    "type": "number"
+                },
+                "polymarket_last_trade_time": {
+                    "type": "string"
+                },
+                "polymarket_outcome": {
+                    "type": "string"
+                },
+                "polymarket_probability_up": {
+                    "type": "number"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "start_price": {
+                    "type": "number"
+                },
+                "synth_outcome": {
+                    "type": "string"
+                },
+                "synth_probability_up": {
+                    "type": "number"
+                }
+            }
+        },
+        "types.PredictionPercentiles": {
+            "type": "object",
+            "properties": {
+                "current_price": {
+                    "type": "number"
+                },
+                "forecast_future": {
+                    "$ref": "#/definitions/types.ForecastDataTyped"
+                }
+            }
+        },
+        "types.PredictionResponse": {
+            "type": "object",
+            "properties": {
+                "miner_uid": {
+                    "type": "integer"
+                },
+                "predictions": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "start_time": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.PriceProbabilityData": {
+            "type": "object",
+            "properties": {
+                "24h": {
+                    "$ref": "#/definitions/types.ProbabilityDirection"
+                }
+            }
+        },
+        "types.PriceRangeMarket": {
+            "type": "object",
+            "properties": {
+                "best_ask_price": {
+                    "type": "number"
+                },
+                "best_ask_size": {
+                    "type": "number"
+                },
+                "best_bid_price": {
+                    "type": "number"
+                },
+                "best_bid_size": {
+                    "type": "number"
+                },
+                "cmp_type": {
+                    "type": "string"
+                },
+                "current_outcome": {
+                    "type": "integer"
+                },
+                "current_price": {
+                    "type": "number"
+                },
+                "current_time": {
+                    "type": "string"
+                },
+                "event_creation_time": {
+                    "type": "string"
+                },
+                "event_end_time": {
+                    "type": "string"
+                },
+                "event_start_time": {
+                    "type": "string"
+                },
+                "forecast_start_time": {
+                    "type": "string"
+                },
+                "polymarket_last_trade_outcome": {
+                    "type": "integer"
+                },
+                "polymarket_last_trade_price": {
+                    "type": "number"
+                },
+                "polymarket_last_trade_time": {
+                    "type": "string"
+                },
+                "polymarket_outcome": {
+                    "type": "integer"
+                },
+                "polymarket_probability": {
+                    "type": "number"
+                },
+                "ref_prices": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "synth_outcome": {
+                    "type": "integer"
+                },
+                "synth_probability": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.PriceReturn": {
+            "type": "object",
+            "properties": {
+                "price": {
+                    "type": "number"
+                },
+                "returns": {
+                    "description": "pointer to handle null values",
+                    "type": "number"
+                }
+            }
+        },
+        "types.ProbabilityDirection": {
+            "type": "object",
+            "properties": {
+                "probability_above": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number"
+                    }
+                },
+                "probability_below": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "types.Realized": {
+            "type": "object",
+            "properties": {
+                "average_volatility": {
+                    "type": "number"
+                },
+                "prices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.PriceReturn"
+                    }
+                },
+                "volatility": {
+                    "description": "pointer slice to handle null values",
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            }
+        },
+        "types.StayInIntervalProbability": {
+            "type": "object",
+            "properties": {
+                "24": {
+                    "type": "number"
+                }
+            }
+        },
+        "types.ValidationScore": {
+            "type": "object",
+            "properties": {
+                "asset": {
+                    "type": "string"
+                },
+                "crps": {
+                    "type": "number"
+                },
+                "miner_uid": {
+                    "type": "integer"
+                },
+                "prompt_score": {
+                    "type": "number"
+                },
+                "scored_time": {
+                    "type": "string"
+                },
+                "time_length": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.VolatilityResponse": {
+            "type": "object",
+            "properties": {
+                "current_price": {
+                    "type": "number"
+                },
+                "forecast_future": {
+                    "$ref": "#/definitions/types.Forecast"
+                },
+                "forecast_past": {
+                    "$ref": "#/definitions/types.Forecast"
+                },
+                "forecast_start_time": {
+                    "type": "string"
+                },
+                "realized": {
+                    "$ref": "#/definitions/types.Realized"
+                }
+            }
+        }
+    }
+}
