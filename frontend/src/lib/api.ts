@@ -40,15 +40,15 @@ export const auth = {
 
 // Settings
 export const settings = {
-  get: () => request('/settings'),
-  update: (data: any) => request('/settings', { method: 'PATCH', body: JSON.stringify(data) }),
+  get: () => request('/settings/'),
+  update: (data: any) => request('/settings/', { method: 'PATCH', body: JSON.stringify(data) }),
 };
 
 // Deribit Keys
 export const keys = {
   save: (client_id: string, client_secret: string) =>
-    request('/keys', { method: 'POST', body: JSON.stringify({ client_id, client_secret }) }),
-  check: () => request('/keys').catch(() => null),
+    request('/keys/deribit', { method: 'POST', body: JSON.stringify({ client_id, client_secret }) }),
+  check: () => request('/keys/deribit/status').catch(() => null),
 };
 
 // Deribit

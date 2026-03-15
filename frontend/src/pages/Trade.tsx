@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useOutletContext } from 'react-router-dom';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { Play, Square, AlertTriangle, CheckCircle2, Activity, Target } from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { useDialog } from '../components/ConfirmationDialog';
-import { signals, deribit, bot as botApi, settings as settingsApi } from '../lib/api';
+import { deribit, bot as botApi, settings as settingsApi } from '../lib/api';
 import { useWebSocket, WsEvent } from '../lib/ws';
+import type { LayoutContext } from '../components/Layout';
 
 const ASSETS = ['BTC', 'ETH'];
 
 type SignalState = 'idle' | 'loading' | 'actionable' | 'hold' | 'tail_risk';
 
 export function Trade() {
-  const { isBotRunning, setIsBotRunning } = useOutletContext<{ isBotRunning: boolean, setIsBotRunning: (v: boolean) => void }>();
+  const { isBotRunning, setIsBotRunning, lastSignal, setLastSignal, lastSignalState, setLastSignalState } = useOutletContext<LayoutContext>();
   const { showToast } = useToast();
   const { showDialog } = useDialog();
   const { events } = useWebSocket();
@@ -22,17 +22,19 @@ export function Trade() {
   const [asset, setAsset] = useState('BTC');
   const [budget, setBudget] = useState('10');
   const [threshold, setThreshold] = useState(65);
-  const [signalState, setSignalState] = useState<SignalState>('idle');
-  const [signalData, setSignalData] = useState<any>(null);
+
+  // Local loading state (not persisted)
+  const [loading, setLoading] = useState(false);
+
+  // Use persisted signal state from Layout
+  const signalState = lastSignalState as SignalState;
+  const signalData = lastSignal;
 
   // Bot Config State
   const [botAsset, setBotAsset] = useState('BTC');
   const [scanInterval, setScanInterval] = useState('300');
   const [takeProfit, setTakeProfit] = useState('20');
   const [stopLoss, setStopLoss] = useState('10');
-
-  // Chart data from signal
-  const [chartData, setChartData] = useState<any[]>([]);
 
   // Load user settings on mount
   useEffect(() => {
@@ -49,8 +51,9 @@ export function Trade() {
   }, []);
 
   const handleGenerateSignal = async () => {
-    setSignalState('loading');
-    setSignalData(null);
+    setLoading(true);
+    setLastSignalState('loading');
+    setLastSignal(null);
     try {
       // Save threshold first
       await settingsApi.update({
@@ -62,27 +65,28 @@ export function Trade() {
 
       if (data.status === 'no_trade') {
         const signal = data.signal;
-        setSignalData(signal);
+        setLastSignal(signal);
         if (signal.tail_risk?.detected) {
-          setSignalState('tail_risk');
+          setLastSignalState('tail_risk');
           showToast('error', 'Tail Risk Detected', signal.reason);
         } else {
-          setSignalState('hold');
+          setLastSignalState('hold');
           showToast('warning', 'Hold Signal', signal.reason);
         }
       } else if (data.signal) {
-        setSignalData(data);
-        setSignalState('actionable');
+        setLastSignal(data);
+        setLastSignalState('actionable');
         showToast('success', 'Trade Executed', `${data.signal.action} — ${data.execution?.instrument || asset}`);
       } else {
-        setSignalData(data);
-        setSignalState('actionable');
+        setLastSignal(data);
+        setLastSignalState('actionable');
         showToast('success', 'Signal Generated', 'Actionable signal detected.');
       }
     } catch (err: any) {
       showToast('error', 'Error', err.message);
-      setSignalState('idle');
+      setLastSignalState('idle');
     }
+    setLoading(false);
   };
 
   const handleToggleBot = async () => {
@@ -176,6 +180,8 @@ export function Trade() {
   const tailRisk = signalData?.signal?.tail_risk || signalData?.tail_risk || {};
   const strike = signalData?.signal?.strike || signalData?.execution || {};
 
+  const showSignal = signalState !== 'idle' && signalState !== 'loading';
+
   return (
     <div className="flex-1 flex flex-col lg:flex-row border-t border-[#2A2A2A]">
       {/* Left Panel - Manual Trade */}
@@ -228,10 +234,10 @@ export function Trade() {
 
         <button
           onClick={handleGenerateSignal}
-          disabled={signalState === 'loading'}
+          disabled={loading}
           className="w-full bg-accent text-[#141414] p-4 font-mono text-sm font-bold hover:bg-[#F05023]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
         >
-          {signalState === 'loading' ? (
+          {loading ? (
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-5 h-5 border-2 border-[#141414] border-t-transparent rounded-full" />
           ) : (
             'GENERATE SIGNAL'
@@ -239,7 +245,7 @@ export function Trade() {
         </button>
 
         {/* Signal Result Card */}
-        {signalState !== 'idle' && signalState !== 'loading' && (
+        {showSignal && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, useCallback, ReactNode } from 'react';
+import React from 'react';
 
 export interface WsEvent {
   event: string;
@@ -6,9 +7,17 @@ export interface WsEvent {
   timestamp: Date;
 }
 
-export function useWebSocket() {
+interface WsContextType {
+  events: WsEvent[];
+  connected: boolean;
+  clearEvents: () => void;
+}
+
+const WsContext = createContext<WsContextType>({ events: [], connected: false, clearEvents: () => {} });
+
+export function WsProvider({ children }: { children: ReactNode }) {
   const wsRef = useRef<WebSocket | null>(null);
-  const [events, setEvents] = useState([] as WsEvent[]);
+  const [events, setEvents] = useState<WsEvent[]>([]);
   const [connected, setConnected] = useState(false);
   const reconnectTimer = useRef<number | undefined>(undefined);
 
@@ -16,7 +25,6 @@ export function useWebSocket() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    // Close existing connection
     if (wsRef.current) {
       wsRef.current.close();
     }
@@ -33,13 +41,12 @@ export function useWebSocket() {
       try {
         const parsed = JSON.parse(msg.data);
         if (parsed.event === 'pong') return;
-        setEvents((prev) => [{ ...parsed, timestamp: new Date() }, ...prev].slice(0, 100));
+        setEvents((prev) => [{ ...parsed, timestamp: new Date() }, ...prev].slice(0, 200));
       } catch {}
     };
 
     ws.onclose = () => {
       setConnected(false);
-      // Auto-reconnect after 3 seconds
       reconnectTimer.current = window.setTimeout(connect, 3000);
     };
 
@@ -50,20 +57,28 @@ export function useWebSocket() {
     wsRef.current = ws;
   }, []);
 
-  const disconnect = useCallback(() => {
-    if (reconnectTimer.current) {
-      clearTimeout(reconnectTimer.current);
-    }
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
-  }, []);
-
   useEffect(() => {
     connect();
-    return disconnect;
-  }, [connect, disconnect]);
+    return () => {
+      if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
+      if (wsRef.current) wsRef.current.close();
+    };
+  }, [connect]);
 
-  return { events, connected, connect, disconnect, clearEvents: () => setEvents([]) };
+  // Reconnect when token changes (login)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'token') connect();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [connect]);
+
+  const clearEvents = useCallback(() => setEvents([]), []);
+
+  return React.createElement(WsContext.Provider, { value: { events, connected, clearEvents } }, children);
+}
+
+export function useWebSocket() {
+  return useContext(WsContext);
 }

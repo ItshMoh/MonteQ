@@ -8,25 +8,28 @@ import { Login } from './pages/Login';
 import { ToastProvider } from './components/Toast';
 import { DialogProvider } from './components/ConfirmationDialog';
 import { AuthProvider } from './lib/auth';
+import { WsProvider } from './lib/ws';
 
 export default function App() {
   return (
     <AuthProvider>
-      <ToastProvider>
-        <DialogProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route element={<Layout />}>
-                <Route path="/trade" element={<Trade />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/portfolio" element={<Portfolio />} />
-              </Route>
-            </Routes>
-          </Router>
-        </DialogProvider>
-      </ToastProvider>
+      <WsProvider>
+        <ToastProvider>
+          <DialogProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route element={<Layout />}>
+                  <Route path="/trade" element={<Trade />} />
+                  <Route path="/history" element={<History />} />
+                  <Route path="/portfolio" element={<Portfolio />} />
+                </Route>
+              </Routes>
+            </Router>
+          </DialogProvider>
+        </ToastProvider>
+      </WsProvider>
     </AuthProvider>
   );
 }

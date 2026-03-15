@@ -7,17 +7,7 @@ router = APIRouter(prefix="/portfolio", tags=["portfolio"])
 
 @router.get("/risk")
 async def portfolio_risk_metrics(user=Depends(get_current_user)):
-    """Portfolio-level risk metrics.
-
-    Returns:
-      - open_positions: count of open trades
-      - max_open_positions: configured limit
-      - total_budget_deployed: sum of budgets on open trades
-      - total_realized_pnl: sum of P&L on closed trades
-      - unrealized_exposure: list of open trades with current data
-      - per_asset_exposure: budget deployed per asset
-      - drawdown: worst realized P&L from closed trades
-    """
+    """Portfolio-level risk metrics."""
     db = get_supabase()
     user_id = user["user_id"]
 
@@ -62,7 +52,7 @@ async def portfolio_risk_metrics(user=Depends(get_current_user)):
         asset = t.get("asset", "unknown")
         per_asset[asset] = per_asset.get(asset, 0) + t.get("budget", 0)
 
-    # Drawdown — cumulative P&L low point from closed trades (sorted by close time)
+    # Drawdown
     sorted_closed = sorted(closed_data, key=lambda x: x.get("closed_at") or "")
     cumulative_pnl = 0.0
     peak_pnl = 0.0

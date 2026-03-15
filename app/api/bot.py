@@ -31,18 +31,7 @@ async def _build_executor(user_id: str) -> TradeExecutor:
 
 @router.post("/start")
 async def start_bot(user=Depends(get_current_user)):
-    """Start the autonomous trading bot.
-
-    The bot will:
-    1. Scan the market every `scan_interval_sec` seconds
-    2. Enter trades when signal crosses the threshold
-    3. Monitor each trade with take-profit and stop-loss
-    4. Repeat until stopped
-
-    Configure via PATCH /settings before starting:
-    - signal_threshold, default_budget, default_asset
-    - take_profit_pct, stop_loss_pct, scan_interval_sec
-    """
+    """Start the autonomous trading bot."""
     user_id = user["user_id"]
 
     # Check if already running
@@ -50,7 +39,6 @@ async def start_bot(user=Depends(get_current_user)):
         task, _ = _active_bots[user_id]
         if not task.done():
             raise HTTPException(status_code=409, detail="Bot is already running")
-        # Clean up finished task
         del _active_bots[user_id]
 
     # Mark bot as active in DB
@@ -72,11 +60,7 @@ async def start_bot(user=Depends(get_current_user)):
 
 @router.post("/stop")
 async def stop_bot(user=Depends(get_current_user)):
-    """Stop the autonomous trading bot.
-
-    Open trades will continue to be monitored until they hit
-    take-profit, stop-loss, or signal exit conditions.
-    """
+    """Stop the autonomous trading bot."""
     user_id = user["user_id"]
 
     # Mark bot as inactive in DB
