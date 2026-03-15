@@ -411,6 +411,11 @@ class TradeExecutor:
                                 stop_loss_pct=stop_loss,
                             )
                         )
+                    else:
+                        # Send execution failure to frontend
+                        await ws_manager.send_to_user(self.user_id, "bot_error", {
+                            "error": f"Trade not executed: {result.get('status')} — {result.get('reason', 'unknown')}",
+                        })
 
             except Exception as e:
                 self._log_event(None, "bot_error", {"error": str(e)})
