@@ -1,4 +1,6 @@
-const BASE = '/api';
+// In dev: '/api' (Vite proxy strips prefix and forwards to localhost:8000)
+// In prod: full backend URL like 'https://monteq-api.onrender.com'
+const BASE = import.meta.env.VITE_API_URL || '/api';
 
 function getToken(): string | null {
   return localStorage.getItem('token');
