@@ -2,9 +2,15 @@
 
 **Autonomous Probabilistic Options Trading Agent**
 
+**Live App: [https://monteq-ai.vercel.app/](https://monteq-ai.vercel.app/)**
+
 MonteQ AI is a non-custodial, autonomous trading agent built for high-frequency, short-term options trading on Deribit. It uses probabilistic price-path simulations from the Synth (SN50) Bittensor subnet to generate directional signals, execute trades, and manage risk — all without manual intervention.
 
 The agent is optimized for a 1-hour trading horizon, analyzing 1,000+ AI-simulated price paths every minute to detect micro-volatility patterns and tail-risk events that traditional models miss.
+
+> **Note:** You will need a Deribit Client ID and Secret to use the autonomous bot. Configure them on the Portfolio page, then start the bot — you will receive signals and trade updates in the time frame you set. You can get a Client ID and Secret without KYC at [https://test.deribit.com/](https://test.deribit.com/).
+>
+> The Deribit testnet is currently under maintenance, so trades cannot be placed right now. Signal generation still works.
 
 ---
 
