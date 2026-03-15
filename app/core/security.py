@@ -1,18 +1,19 @@
+import hashlib
+import bcrypt
 import jwt
 from datetime import datetime, timedelta, timezone
-from passlib.context import CryptContext
 from cryptography.fernet import Fernet
 from app.core.config import get_settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    pw = hashlib.sha256(password.encode()).hexdigest().encode()
+    return bcrypt.hashpw(pw, bcrypt.gensalt()).decode()
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    pw = hashlib.sha256(plain.encode()).hexdigest().encode()
+    return bcrypt.checkpw(pw, hashed.encode())
 
 
 def create_access_token(user_id: str) -> str:

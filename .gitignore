@@ -6,3 +6,14 @@ venv/
 dist/
 build/
 .pytest_cache/
+frontend/node_modules
+siteimages/
+synthdocs/
+deribitdocs/
+script.sh 
+change.md 
+frontend.md 
+project.md 
+routefrontend.md 
+mockfrontend/ 
+phase.md 

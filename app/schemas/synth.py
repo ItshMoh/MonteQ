@@ -1,10 +1,11 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
-class PricePathRequest(BaseModel):
+class SynthQueryParams(BaseModel):
     asset: str = "BTC"
     horizon: str = "1h"
 
 
-class OptionPricingRequest(BaseModel):
+class OptionPricingParams(BaseModel):
     asset: str = "BTC"
