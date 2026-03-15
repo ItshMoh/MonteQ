@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expiry_minutes: int = 1440
     deribit_env: str = "test"  # "test" or "live"
+    frontend_url: str = "http://localhost:3000"
 
     @property
     def deribit_base_url(self) -> str:

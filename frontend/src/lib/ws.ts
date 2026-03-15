@@ -29,8 +29,19 @@ export function WsProvider({ children }: { children: ReactNode }) {
       wsRef.current.close();
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws?token=${token}`);
+    const apiUrl = import.meta.env.VITE_API_URL;
+    let wsUrl: string;
+    if (apiUrl) {
+      // Production: derive WS URL from API URL (https://x.com -> wss://x.com/ws)
+      const wsProtocol = apiUrl.startsWith('https') ? 'wss:' : 'ws:';
+      const host = apiUrl.replace(/^https?:\/\//, '');
+      wsUrl = `${wsProtocol}//${host}/ws?token=${token}`;
+    } else {
+      // Dev: use Vite proxy
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      wsUrl = `${protocol}//${window.location.host}/ws?token=${token}`;
+    }
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       setConnected(true);

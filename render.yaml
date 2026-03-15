@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: monteq-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SYNTH_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: DERIBIT_ENV
+        value: test
+      - key: FRONTEND_URL
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.11"
+    healthCheckPath: /health

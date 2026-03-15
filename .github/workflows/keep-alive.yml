@@ -1,0 +1,14 @@
+name: Keep Alive
+
+on:
+  schedule:
+    # Every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: curl -fsS "${{ secrets.RENDER_API_URL }}/health" || true
