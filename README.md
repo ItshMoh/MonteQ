@@ -210,15 +210,6 @@ The API will be available at `http://localhost:8000`. Interactive docs at `http:
 
 ---
 
-## Project Status
-
-- [x] Phase 1: Foundation and Data Layer
-- [x] Phase 2: Signal Engine
-- [x] Phase 3: Deribit Execution (Testnet)
-- [x] Phase 4: Risk Management and Monitoring
-- [ ] Phase 5: Autonomous Trading Bot
-- [ ] Phase 6: Frontend Dashboard
-- [ ] Phase 7: Mode Network Integration
 
 ---
 
