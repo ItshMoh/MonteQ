@@ -1,28 +1,72 @@
 # MonteQ AI
 
-**Autonomous Probabilistic Options Trading Agent**
+**Autonomous Probabilistic Options Trading Agent — Deribit & Derive DEX**
 
 **Live App: [https://monteq-ai.vercel.app/](https://monteq-ai.vercel.app/)**
 
-MonteQ AI is a non-custodial, autonomous trading agent built for high-frequency, short-term options trading on Deribit. It uses probabilistic price-path simulations from the Synth (SN50) Bittensor subnet to generate directional signals, execute trades, and manage risk — all without manual intervention.
+**Demo Video: [Watch on Loom](https://www.loom.com/share/96df75578daa4948a4ae85ee874ad3d6)**
+
+MonteQ AI is a non-custodial, autonomous trading agent built for high-frequency, short-term options trading on **Deribit** and **Derive (Lyra v2)**. It uses probabilistic price-path simulations from the Synth (SN50) Bittensor subnet to generate directional signals, execute trades, and manage risk — all without manual intervention.
+
+The agent supports one exchange at a time — users can switch between Deribit and Derive from the Portfolio settings page. Both exchanges support BTC and ETH options trading on testnet.
 
 The agent is optimized for a 1-hour trading horizon, analyzing 1,000+ AI-simulated price paths every minute to detect micro-volatility patterns and tail-risk events that traditional models miss.
 
-> **Note:** You will need a Deribit Client ID and Secret to use the autonomous bot. Configure them on the Portfolio page, then start the bot — you will receive signals and trade updates in the time frame you set. You can get a Client ID and Secret without KYC at [https://test.deribit.com/](https://test.deribit.com/).
->
-> The Deribit testnet is currently under maintenance, so trades cannot be placed right now. Signal generation still works.
+---
+
+## Getting Started
+
+### 1. Sign Up
+Go to [https://monteq-ai.vercel.app/](https://monteq-ai.vercel.app/) and create an account with your email and password.
+
+### 2. Connect an Exchange
+Navigate to the **Portfolio** page and choose your exchange:
+
+#### Deribit (Recommended for testnet)
+1. Create a free account at [https://test.deribit.com/](https://test.deribit.com/) (no KYC required)
+2. Go to **My Account → API** and create a new API key with **trade** permissions
+3. Copy your **Client ID** and **Client Secret**
+4. Paste them into the Deribit section on the Portfolio page and click **SAVE DERIBIT KEYS**
+
+#### Derive (Lyra v2)
+1. Go to [https://testnet.derive.xyz/](https://testnet.derive.xyz/) and connect your wallet
+2. Create a subaccount and mint testnet USDC from the faucet
+3. You will need three things from Derive:
+   - **Session Key Private Key** — the private key of the signer/session key registered to your wallet
+   - **Wallet Address** — the smart contract wallet address shown on Derive (not your MetaMask address)
+   - **Subaccount ID** — the numeric subaccount ID (find it via Derive UI or by calling `POST /public/get_subaccounts` with your wallet address)
+4. Paste them into the Derive section on the Portfolio page and click **SAVE DERIVE KEYS**
+
+### 3. Configure & Trade
+- Set your **default budget**, **signal threshold**, **take profit %**, and **stop loss %** on the Portfolio page
+- Go to the **Trade** page to generate manual signals or start the **Autonomous Bot**
+- The bot will automatically scan, enter, monitor, and exit trades based on your parameters
+- Watch the **Activity Log** for real-time updates on signals and trades
+
+> **Note on Derive Liquidity:** BTC options on Derive testnet have very low liquidity — use **ETH** for better results. If you see "Cannot determine limit price" errors, it means the selected option has no market makers. Deribit testnet generally has better liquidity across both BTC and ETH.
 
 ---
 
 ## How It Works
 
-1. **User connects** their Deribit API key (trade-only permissions) and sets a budget per trade.
+1. **User connects** their exchange API credentials and sets a budget per trade.
 2. **Agent fetches** the latest 1-hour volatility distribution from Synth (SN50).
 3. **Signal engine** calculates directional bias — if 75%+ of simulated paths trend in one direction, a Buy Call or Buy Put signal is generated.
-4. **Execution** — the agent finds the optimal strike price on Deribit and places a limit order at fair value derived from the probability distribution.
+4. **Execution** — the agent finds the optimal strike price on the active exchange (Deribit or Derive) and places a limit order at fair value derived from the probability distribution.
 5. **Active monitoring** — the agent re-checks Synth every minute, exiting early if probability of profit drops below threshold, or if take-profit / stop-loss targets are hit.
 
 In autonomous mode, the bot repeats this cycle continuously: scan, enter, monitor, exit, repeat.
+
+---
+
+## Supported Exchanges
+
+| Exchange | Auth Method | Assets | Testnet |
+|----------|-----------|--------|---------|
+| **Deribit** | Client ID + Client Secret (OAuth2) | BTC, ETH | [test.deribit.com](https://test.deribit.com/) |
+| **Derive (Lyra v2)** | Private Key + Wallet Address + Subaccount ID (Web3 signing) | BTC, ETH | [testnet.derive.xyz](https://testnet.derive.xyz/) |
+
+Users select one active exchange at a time from the Portfolio settings. Each exchange has its own set of encrypted credentials and separate API routes.
 
 ---
 
@@ -35,7 +79,8 @@ In autonomous mode, the bot repeats this cycle continuously: scan, enter, monito
 - **Tail-Risk Detection** — Blocks trades during black swan conditions (extreme volatility spikes, abnormal tail spreads)
 - **Configurable Thresholds** — Users set the minimum bias percentage required to trigger a trade
 
-### Trade Execution (Deribit)
+### Trade Execution (Deribit & Derive)
+- **Dual Exchange Support** — Execute trades on Deribit (OAuth2) or Derive DEX (Web3 action signing)
 - **Limit Order Optimization** — Places orders at fair value from Synth's distribution to avoid slippage
 - **Dynamic Stop-Loss / Take-Profit** — Exit points adjust in real-time based on shifting distributions
 - **$10 Scalping Mode** — Optimized for small-stake, high-frequency near-the-money options
@@ -45,6 +90,7 @@ In autonomous mode, the bot repeats this cycle continuously: scan, enter, monito
 ### Autonomous Bot
 - **Auto-Scan Loop** — Polls Synth at configurable intervals, enters trades when signals cross threshold
 - **Full Autonomous Cycle** — Scan, enter, monitor, exit, repeat — no manual intervention required
+- **Exchange-Aware** — Automatically uses the active exchange for all operations
 - **Start/Stop Control** — Simple API endpoints to activate or deactivate the bot
 - **Configurable Parameters** — Scan interval, take-profit %, stop-loss %, budget, max positions
 
@@ -63,10 +109,11 @@ In autonomous mode, the bot repeats this cycle continuously: scan, enter, monito
 | Component | Technology | Role |
 |-----------|-----------|------|
 | Brain | Synth (SN50) API | Monte Carlo price simulations, volatility data, liquidation probabilities |
-| Execution | Deribit API | Authentication, order placement, position monitoring, account info |
+| Execution | Deribit API + Derive REST API | Authentication, order placement, position monitoring, account info |
+| Signing | derive-action-signing (PyPI) | Web3 action signing for Derive order placement |
 | Backend | Python / FastAPI | Signal engine, trade executor, autonomous bot loop, WebSocket server |
 | Database | Supabase (PostgreSQL) | Users, encrypted API keys, trade signals, trade history, settings, audit logs |
-| Frontend | React / Next.js | Dashboard for trading, portfolio monitoring, bot control, trade history |
+| Frontend | React + Vite | Dashboard for trading, portfolio monitoring, bot control, trade history |
 | Network | Mode Network | On-chain trade intent logging and verification (planned) |
 
 ---
@@ -83,7 +130,9 @@ In autonomous mode, the bot repeats this cycle continuously: scan, enter, monito
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/keys/deribit` | Store encrypted Deribit API keys |
-| GET | `/keys/deribit/status` | Check if keys are configured |
+| GET | `/keys/deribit/status` | Check if Deribit keys are configured |
+| POST | `/keys/derive` | Store encrypted Derive credentials |
+| GET | `/keys/derive/status` | Check if Derive keys are configured |
 
 ### Synth Data
 | Method | Endpoint | Description |
@@ -122,6 +171,19 @@ In autonomous mode, the bot repeats this cycle continuously: scan, enter, monito
 | POST | `/deribit/monitor/{trade_id}` | Start background monitoring for a trade |
 | DELETE | `/deribit/orders` | Cancel all MonteQ-labeled orders |
 
+### Derive
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/derive/account` | Subaccount summary |
+| GET | `/derive/positions` | All open option positions |
+| GET | `/derive/orders` | All open orders |
+| GET | `/derive/instruments` | Available options instruments |
+| GET | `/derive/orderbook/{instrument}` | Order book / ticker for an instrument |
+| POST | `/derive/execute` | Generate signal and execute trade |
+| POST | `/derive/close/{trade_id}` | Close an open trade |
+| POST | `/derive/monitor/{trade_id}` | Start background monitoring for a trade |
+| DELETE | `/derive/orders` | Cancel all open orders |
+
 ### Autonomous Bot
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -138,7 +200,7 @@ In autonomous mode, the bot repeats this cycle continuously: scan, enter, monito
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/settings/` | Fetch user settings |
-| PATCH | `/settings/` | Update user settings |
+| PATCH | `/settings/` | Update user settings (including active_exchange) |
 
 ### WebSocket
 | Endpoint | Description |
@@ -153,10 +215,11 @@ WebSocket event types: `trade_opened`, `trade_closed`, `trade_stopped`, `signal_
 
 - **users** — email, password hash
 - **deribit_keys** — encrypted API key and secret per user
+- **derive_keys** — encrypted private key, wallet address, and subaccount ID per user
 - **trade_signals** — generated signals with asset, direction, bias, CRPS, PoP, strike, status
-- **trades** — executed trades with entry/exit prices, P&L, Deribit order ID, status
+- **trades** — executed trades with entry/exit prices, P&L, order IDs (Deribit or Derive), exchange field, status
 - **trade_events** — audit log of all trade lifecycle events
-- **user_settings** — default budget, signal threshold, max positions, TP/SL percentages, scan interval, bot active flag
+- **user_settings** — default budget, signal threshold, max positions, TP/SL percentages, scan interval, bot active flag, active_exchange
 
 ---
 
@@ -164,7 +227,7 @@ WebSocket event types: `trade_opened`, `trade_closed`, `trade_stopped`, `signal_
 
 BTC, ETH, SOL, XAU, SPY, NVDA, GOOGL, TSLA, AAPL
 
-All asset data is sourced from the Synth (SN50) Bittensor subnet.
+All asset data is sourced from the Synth (SN50) Bittensor subnet. Trade execution is available for BTC and ETH options on both Deribit and Derive.
 
 ---
 
@@ -173,8 +236,10 @@ All asset data is sourced from the Synth (SN50) Bittensor subnet.
 ### Prerequisites
 
 - Python 3.11+
+- Node.js 18+
 - Supabase project (for database)
-- Deribit account with API keys (testnet recommended for initial use)
+- Deribit account with API keys (testnet recommended)
+- Derive wallet with session key (testnet recommended)
 
 ### Installation
 
@@ -196,6 +261,8 @@ SUPABASE_KEY=<your-supabase-anon-key>
 JWT_SECRET=<your-jwt-secret>
 ENCRYPTION_KEY=<your-fernet-encryption-key>
 DERIBIT_ENV=test
+DERIVE_ENV=test
+FRONTEND_URL=http://localhost:3000
 ```
 
 ### Database Setup
@@ -209,13 +276,16 @@ Run the schema in your Supabase SQL editor:
 ### Run
 
 ```bash
+# Backend
 uvicorn app.main:app --reload
+
+# Frontend
+cd frontend
+npm install
+npm run dev
 ```
 
 The API will be available at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
-
----
-
 
 ---
 
