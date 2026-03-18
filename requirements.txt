@@ -60,3 +60,4 @@ websockets==15.0.1
 yarl==1.23.0
 zstandard==0.25.0
 web3==7.14.1
+derive-action-signing
