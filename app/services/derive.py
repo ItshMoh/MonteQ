@@ -40,6 +40,8 @@ class DeriveClient:
             )
             data = resp.json()
 
+            print(f"[DERIVE API] POST /public/{endpoint} → {resp.status_code}")
+
             if resp.status_code != 200:
                 raise Exception(f"Derive API error ({resp.status_code}): {data}")
 

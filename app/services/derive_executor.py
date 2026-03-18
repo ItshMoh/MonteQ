@@ -88,6 +88,7 @@ class DeriveTradeExecutor:
 
         # Step 2: Get order book for fair value
         order_book = await self.derive.get_order_book(instrument_name)
+        print(f"[DERIVE EXECUTOR] Order book for {instrument_name}: {order_book}")
         best_ask = order_book.get("best_ask_price", 0)
         best_bid = order_book.get("best_bid_price", 0)
         mark_price = order_book.get("mark_price", 0)
