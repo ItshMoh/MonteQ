@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, User } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 
-export function Navbar({ isBotRunning }: { isBotRunning: boolean }) {
+export function Navbar({ isBotRunning, activeExchange }: { isBotRunning: boolean; activeExchange: string }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -46,6 +46,10 @@ export function Navbar({ isBotRunning }: { isBotRunning: boolean }) {
         </div>
       </div>
       <div className="flex items-center gap-6">
+        <Link to="/portfolio" className="hidden md:flex items-center gap-2 px-3 py-1.5 border border-[#2A2A2A] hover:border-accent transition-colors font-mono text-xs">
+          <span className={`w-1.5 h-1.5 rounded-full ${activeExchange === 'derive' ? 'bg-purple-500' : 'bg-accent'}`}></span>
+          {activeExchange === 'derive' ? 'DERIVE' : 'DERIBIT'}
+        </Link>
         <button className="relative hover:text-accent transition-colors">
           <Bell className="w-5 h-5" />
         </button>

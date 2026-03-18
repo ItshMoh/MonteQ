@@ -55,11 +55,14 @@ export function Home() {
                 MonteQ<br/>AI
               </h1>
               <p className="font-sans text-lg max-w-md mb-10 text-gray-800">
-                Autonomous options agent powered by 1,000+ AI-simulated price paths. High-frequency options trading on Deribit.
+                Autonomous options agent powered by 1,000+ AI-simulated price paths. High-frequency options trading on Deribit & Derive.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link to="/portfolio" className="bg-[#141414] text-[#EBE8E1] px-8 py-4 font-mono text-sm hover:bg-accent transition-colors clip-button inline-block text-center">
+                <Link to="/portfolio?exchange=deribit" className="bg-[#141414] text-[#EBE8E1] px-8 py-4 font-mono text-sm hover:bg-accent transition-colors clip-button inline-block text-center">
                   CONNECT DERIBIT
+                </Link>
+                <Link to="/portfolio?exchange=derive" className="bg-[#141414] text-[#EBE8E1] px-8 py-4 font-mono text-sm hover:bg-purple-600 transition-colors clip-button inline-block text-center">
+                  CONNECT DERIVE
                 </Link>
                 <Link to="/trade" className="border border-[#141414] px-8 py-4 font-mono text-sm hover:bg-[#141414] hover:text-[#EBE8E1] transition-colors clip-button bg-[#EBE8E1] inline-block text-center">
                   VIEW LIVE SIGNALS
@@ -368,7 +371,7 @@ export function Home() {
               Deploy<br/>MonteQ
             </h2>
             <p className="font-sans text-xl max-w-md font-medium">
-              Connect your Deribit API key, set your budget, and let MonteQ AI trade autonomously. Start on testnet with zero risk, go live when you're ready.
+              Connect your Deribit or Derive keys, set your budget, and let MonteQ AI trade autonomously. Start on testnet with zero risk, go live when you're ready.
             </p>
           </div>
 

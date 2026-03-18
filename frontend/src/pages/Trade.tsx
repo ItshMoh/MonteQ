@@ -4,16 +4,21 @@ import { useOutletContext } from 'react-router-dom';
 import { Play, Square, AlertTriangle, CheckCircle2, Activity, Target } from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { useDialog } from '../components/ConfirmationDialog';
-import { deribit, bot as botApi, settings as settingsApi } from '../lib/api';
+import { deribit, derive, bot as botApi, settings as settingsApi, getExchangeApi } from '../lib/api';
 import { useWebSocket, WsEvent } from '../lib/ws';
 import type { LayoutContext } from '../components/Layout';
 
 const ASSETS = ['BTC', 'ETH'];
 
+const ASSET_ICONS: Record<string, string> = {
+  BTC: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
+  ETH: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
+};
+
 type SignalState = 'idle' | 'loading' | 'actionable' | 'hold' | 'tail_risk';
 
 export function Trade() {
-  const { isBotRunning, setIsBotRunning, lastSignal, setLastSignal, lastSignalState, setLastSignalState } = useOutletContext<LayoutContext>();
+  const { isBotRunning, setIsBotRunning, lastSignal, setLastSignal, lastSignalState, setLastSignalState, activeExchange } = useOutletContext<LayoutContext>();
   const { showToast } = useToast();
   const { showDialog } = useDialog();
   const { events } = useWebSocket();
@@ -61,7 +66,8 @@ export function Trade() {
         default_budget: parseFloat(budget),
       });
 
-      const data = await deribit.execute(asset);
+      const exchangeApi = getExchangeApi(activeExchange);
+      const data = await exchangeApi.execute(asset);
 
       if (data.status === 'no_trade') {
         const signal = data.signal;
@@ -186,20 +192,37 @@ export function Trade() {
     <div className="flex-1 flex flex-col lg:flex-row border-t border-[#2A2A2A]">
       {/* Left Panel - Manual Trade */}
       <div className="w-full lg:w-[60%] border-r border-[#2A2A2A] p-6 lg:p-12 flex flex-col gap-8">
-        <div className="font-mono text-xs font-bold text-gray-500 tracking-widest">TRADE</div>
+        <div className="flex items-center justify-between">
+          <div className="font-mono text-xs font-bold text-gray-500 tracking-widest">TRADE</div>
+          <div className={`font-mono text-xs px-3 py-1 border flex items-center gap-2 ${
+            activeExchange === 'derive' ? 'border-purple-500/50 text-purple-400' : 'border-accent/50 text-accent'
+          }`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${activeExchange === 'derive' ? 'bg-purple-500' : 'bg-accent'}`}></span>
+            {activeExchange === 'derive' ? 'DERIVE' : 'DERIBIT'}
+          </div>
+        </div>
 
         {/* Input Section */}
         <div className="border border-[#2A2A2A] bg-[#1A1A1A] p-6 flex flex-col gap-6">
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-1">
               <label className="block font-mono text-xs text-gray-400 mb-2">Asset</label>
-              <select
-                value={asset}
-                onChange={(e) => setAsset(e.target.value)}
-                className="w-full bg-[#141414] border border-[#2A2A2A] text-[#EBE8E1] p-3 font-mono text-sm outline-none focus:border-accent"
-              >
-                {ASSETS.map(a => <option key={a} value={a}>{a}</option>)}
-              </select>
+              <div className="flex gap-2">
+                {ASSETS.map(a => (
+                  <button
+                    key={a}
+                    onClick={() => setAsset(a)}
+                    className={`flex-1 flex items-center justify-center gap-2 p-3 font-mono text-sm border transition-colors ${
+                      asset === a
+                        ? 'border-accent bg-accent/10 text-[#EBE8E1]'
+                        : 'border-[#2A2A2A] bg-[#141414] text-gray-500 hover:border-gray-500'
+                    }`}
+                  >
+                    <img src={ASSET_ICONS[a]} alt={a} className="w-5 h-5 rounded-full" />
+                    {a}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="flex-1">
               <label className="block font-mono text-xs text-gray-400 mb-2">Budget</label>
@@ -339,14 +362,23 @@ export function Trade() {
           <div className="space-y-4 mb-6">
             <div className="flex justify-between items-center">
               <label className="font-mono text-xs text-gray-400">Asset</label>
-              <select
-                disabled={isBotRunning}
-                value={botAsset}
-                onChange={(e) => setBotAsset(e.target.value)}
-                className="bg-[#141414] border border-[#2A2A2A] text-[#EBE8E1] p-2 font-mono text-xs outline-none focus:border-accent disabled:opacity-50"
-              >
-                {ASSETS.map(a => <option key={a} value={a}>{a}</option>)}
-              </select>
+              <div className="flex gap-1.5">
+                {ASSETS.map(a => (
+                  <button
+                    key={a}
+                    disabled={isBotRunning}
+                    onClick={() => setBotAsset(a)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 font-mono text-xs border transition-colors disabled:opacity-50 ${
+                      botAsset === a
+                        ? 'border-accent bg-accent/10 text-[#EBE8E1]'
+                        : 'border-[#2A2A2A] bg-[#141414] text-gray-500 hover:border-gray-500'
+                    }`}
+                  >
+                    <img src={ASSET_ICONS[a]} alt={a} className="w-4 h-4 rounded-full" />
+                    {a}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="flex justify-between items-center">
               <label className="font-mono text-xs text-gray-400">Scan Every</label>

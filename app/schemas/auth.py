@@ -20,3 +20,9 @@ class TokenResponse(BaseModel):
 class DeribitKeyRequest(BaseModel):
     client_id: str
     client_secret: str
+
+
+class DeriveKeyRequest(BaseModel):
+    private_key: str
+    wallet_address: str
+    subaccount_id: int

@@ -4,8 +4,10 @@ from app.core.deps import get_current_user
 from app.core.database import get_supabase
 from app.core.security import decrypt_api_key
 from app.services.deribit import DeribitClient
+from app.services.derive import DeriveClient
 from app.services.synth import get_synth_client
 from app.services.executor import TradeExecutor
+from app.services.derive_executor import DeriveTradeExecutor
 
 router = APIRouter(prefix="/bot", tags=["bot"])
 
@@ -13,20 +15,41 @@ router = APIRouter(prefix="/bot", tags=["bot"])
 _active_bots: dict[str, tuple[asyncio.Task, asyncio.Event]] = {}
 
 
-async def _build_executor(user_id: str) -> TradeExecutor:
-    """Build an authenticated TradeExecutor for a user."""
+def _get_active_exchange(user_id: str) -> str:
+    """Get the user's active exchange from settings."""
     db = get_supabase()
-    keys = db.table("deribit_keys").select("*").eq("user_id", user_id).execute()
-    if not keys.data:
-        raise HTTPException(status_code=400, detail="Deribit API keys not configured")
+    result = db.table("user_settings").select("active_exchange").eq("user_id", user_id).execute()
+    if result.data:
+        return result.data[0].get("active_exchange", "deribit")
+    return "deribit"
 
-    client_id = decrypt_api_key(keys.data[0]["client_id_enc"])
-    client_secret = decrypt_api_key(keys.data[0]["client_secret_enc"])
-    deribit = DeribitClient(client_id, client_secret)
-    await deribit.authenticate()
 
+async def _build_executor(user_id: str):
+    """Build an authenticated executor for the user's active exchange."""
+    db = get_supabase()
+    exchange = _get_active_exchange(user_id)
     synth = get_synth_client()
-    return TradeExecutor(deribit, synth, user_id)
+
+    if exchange == "derive":
+        keys = db.table("derive_keys").select("*").eq("user_id", user_id).execute()
+        if not keys.data:
+            raise HTTPException(status_code=400, detail="Derive API keys not configured")
+
+        private_key = decrypt_api_key(keys.data[0]["private_key_enc"])
+        wallet_address = decrypt_api_key(keys.data[0]["wallet_address_enc"])
+        subaccount_id = keys.data[0]["subaccount_id"]
+        derive = DeriveClient(private_key, wallet_address, subaccount_id)
+        return DeriveTradeExecutor(derive, synth, user_id)
+    else:
+        keys = db.table("deribit_keys").select("*").eq("user_id", user_id).execute()
+        if not keys.data:
+            raise HTTPException(status_code=400, detail="Deribit API keys not configured")
+
+        client_id = decrypt_api_key(keys.data[0]["client_id_enc"])
+        client_secret = decrypt_api_key(keys.data[0]["client_secret_enc"])
+        deribit = DeribitClient(client_id, client_secret)
+        await deribit.authenticate()
+        return TradeExecutor(deribit, synth, user_id)
 
 
 @router.post("/start")
@@ -94,6 +117,7 @@ async def bot_status(user=Depends(get_current_user)):
     return {
         "running": running,
         "bot_active": config.get("bot_active", False),
+        "active_exchange": config.get("active_exchange", "deribit"),
         "scan_interval_sec": config.get("scan_interval_sec", 300),
         "take_profit_pct": config.get("take_profit_pct", 0.20),
         "stop_loss_pct": config.get("stop_loss_pct", 0.10),

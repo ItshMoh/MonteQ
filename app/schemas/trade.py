@@ -74,6 +74,7 @@ class UserSettingsUpdate(BaseModel):
     take_profit_pct: Optional[float] = None   # e.g. 0.20 = 20%
     stop_loss_pct: Optional[float] = None     # e.g. 0.10 = 10%
     scan_interval_sec: Optional[int] = None   # seconds between auto-scans
+    active_exchange: Optional[str] = None     # "deribit" or "derive"
 
 
 class UserSettingsResponse(BaseModel):
@@ -86,3 +87,4 @@ class UserSettingsResponse(BaseModel):
     stop_loss_pct: float = 0.10
     scan_interval_sec: int = 300
     bot_active: bool = False
+    active_exchange: str = "deribit"

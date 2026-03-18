@@ -53,6 +53,13 @@ export const keys = {
   check: () => request('/keys/deribit/status').catch(() => null),
 };
 
+// Derive Keys
+export const deriveKeys = {
+  save: (private_key: string, wallet_address: string, subaccount_id: number) =>
+    request('/keys/derive', { method: 'POST', body: JSON.stringify({ private_key, wallet_address, subaccount_id }) }),
+  check: () => request('/keys/derive/status').catch(() => null),
+};
+
 // Deribit
 export const deribit = {
   account: (currency = 'BTC') => request(`/deribit/account?currency=${currency}`),
@@ -62,6 +69,25 @@ export const deribit = {
   close: (tradeId: string) => request(`/deribit/close/${tradeId}`, { method: 'POST' }),
   cancelAll: () => request('/deribit/orders', { method: 'DELETE' }),
 };
+
+// Derive
+export const derive = {
+  account: () => request('/derive/account'),
+  positions: (currency = 'ETH') => request(`/derive/positions?currency=${currency}`),
+  orders: (currency = 'ETH') => request(`/derive/orders?currency=${currency}`),
+  execute: (asset = 'ETH') => request(`/derive/execute?asset=${asset}`, { method: 'POST' }),
+  close: (tradeId: string) => request(`/derive/close/${tradeId}`, { method: 'POST' }),
+  cancelAll: () => request('/derive/orders', { method: 'DELETE' }),
+};
+
+// Exchange-aware helpers
+export function getExchangeApi(exchange: string) {
+  return exchange === 'derive' ? derive : deribit;
+}
+
+export function getKeysApi(exchange: string) {
+  return exchange === 'derive' ? deriveKeys : keys;
+}
 
 // Signals
 export const signals = {

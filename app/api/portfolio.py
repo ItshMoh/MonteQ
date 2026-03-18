@@ -80,6 +80,7 @@ async def portfolio_risk_metrics(user=Depends(get_current_user)):
                 "strike_price": t["strike_price"],
                 "entry_price": t["entry_price"],
                 "budget": t["budget"],
+                "exchange": t.get("exchange", "deribit"),
                 "opened_at": t["opened_at"],
             }
             for t in open_data
